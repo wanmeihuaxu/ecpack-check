@@ -1,0 +1,16 @@
+{
+    "main": "index.html",
+    "preload": "preload.js",
+    "logo": "ecck_logo.png",
+    "features": [
+        {
+            "code": "ecpack-check",
+            "explain": "查看补丁包打包情况",
+            "cmds": [
+                "ecpack-check",
+                "补丁包",
+                "查看补丁包打包情况"
+            ]
+        }
+    ]
+}
