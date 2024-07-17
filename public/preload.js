@@ -1,6 +1,6 @@
+const { randomUUID } = require('crypto');
 const fs = require('fs')
 const path = require('path');
-const uuid = require('node-uuid')
 const exec = require('child_process').exec;
 
 async function cmd(cmd) {
@@ -100,11 +100,14 @@ function getAllFileRelativeJson(dir) {
     for (const e of files) {
         let node = tree
         const nodenames = e.split('/')
+        
+        let cj = 0;
         while (nodenames.length > 0) {
+            cj++
             const nodename = nodenames.shift()
             if (!node.children.map(e => e.label).includes(nodename)) {
                 node.children.push({
-                    id: nodename + '_' + uuid.v1(),
+                    id: nodename + '_' + randomUUID(),
                     label: nodename,
                     children: []
                 })
@@ -150,7 +153,8 @@ window.ecpack = {
     },
     getPackPath: () => {
         const nativeId = window.utools.getNativeId()
-        return window.utools.dbStorage.getItem('ecology_path/' + nativeId)
+        let pacPath = window.utools.dbStorage.getItem('ecology_path/' + nativeId)
+        return pacPath?pacPath:""
     },
     selectDir: () => {
         return window.utools.showOpenDialog({
@@ -163,7 +167,8 @@ window.ecpack = {
     },
     getJdPath: () => {
         const nativeId = window.utools.getNativeId()
-        return window.utools.dbStorage.getItem('jd_path/' + nativeId)
+        let jdPath = window.utools.dbStorage.getItem('jd_path/' + nativeId)
+        return jdPath?jdPath:""
     },
     selectJdDir: () => {
         return window.utools.showOpenDialog({
@@ -193,6 +198,9 @@ window.ecpack = {
     getTreeData: () => {
         var arr = []
         const pacPath = window.ecpack.getPackPath()
+        if (pacPath == null || pacPath == '') {
+            return []
+        }
         var data = getAllFileRelativeJson(pacPath)
         arr.push(data)
         return arr

@@ -61,14 +61,6 @@ export default class App extends React.Component {
         window.refresh = this.refresh;
     }
 
-    handleClickOpen = () => {
-        this.setState({ open: true })
-    };
-
-    handleClose = () => {
-        this.setState({ open: false })
-    };
-
     handleOk = () => {
         window.ecpack.showClassSource()
     };
@@ -89,7 +81,8 @@ export default class App extends React.Component {
             window.ecpack.savePackPath(dir[0]);
             this.setState({
                 ecpackPath: window.ecpack.getPackPath(),
-                packFileList: window.ecpack.getAllFile(window.ecpack.getPackPath())
+                packFileList: window.ecpack.getAllFile(window.ecpack.getPackPath()),
+                treeData: window.ecpack.getTreeData()
             })
         }
     }
@@ -146,14 +139,17 @@ export default class App extends React.Component {
                     <Button variant="contained" color="primary" onClick={() => this.openDir()} style={{ marginLeft: '10px' }}>打开目录</Button>
                 </div>
 
-                <div style={{ margin: '10px' }}>
-                    文件树状结构：
-                </div>
-                <div style={{ margin: '10px' }}>
-                    <Box>
-                        <RichTreeView items={treeData} />
-                    </Box>
-                </div>
+                {treeData.length > 0 &&
+                    <><div style={{ margin: '10px' }}>
+                        文件树状结构：
+                    </div>
+                        <div style={{ margin: '10px' }}>
+                            <Box>
+                                <RichTreeView items={treeData} />
+                            </Box>
+                        </div></>
+                }
+
             </ThemeProvider>
         )
     }
