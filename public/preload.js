@@ -101,9 +101,7 @@ function getAllFileRelativeJson(dir) {
         let node = tree
         const nodenames = e.split('/')
         
-        let cj = 0;
         while (nodenames.length > 0) {
-            cj++
             const nodename = nodenames.shift()
             if (!node.children.map(e => e.label).includes(nodename)) {
                 node.children.push({
