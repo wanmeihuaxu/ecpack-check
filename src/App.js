@@ -155,12 +155,6 @@ export default class App extends React.Component {
     }
 }
 
-if (!window.setImmediate) {
-    window.setImmediate = function (fn) {
-        return setTimeout(fn, 0);
-    }
-}
-
 window.addEventListener('visibilitychange', function () {
     if (!document.hidden) {
         this.refresh();
