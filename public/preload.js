@@ -1,5 +1,6 @@
 const { randomUUID } = require('crypto');
 const fs = require('fs')
+const archiver = require('archiver');
 const path = require('path');
 const exec = require('child_process').exec;
 
@@ -100,7 +101,7 @@ function getAllFileRelativeJson(dir) {
     for (const e of files) {
         let node = tree
         const nodenames = e.split('/')
-        
+
         while (nodenames.length > 0) {
             const nodename = nodenames.shift()
             if (!node.children.map(e => e.label).includes(nodename)) {
@@ -152,7 +153,7 @@ window.ecpack = {
     getPackPath: () => {
         const nativeId = window.utools.getNativeId()
         let pacPath = window.utools.dbStorage.getItem('ecology_path/' + nativeId)
-        return pacPath?pacPath:""
+        return pacPath ? pacPath : ""
     },
     selectDir: () => {
         return window.utools.showOpenDialog({
@@ -166,7 +167,7 @@ window.ecpack = {
     getJdPath: () => {
         const nativeId = window.utools.getNativeId()
         let jdPath = window.utools.dbStorage.getItem('jd_path/' + nativeId)
-        return jdPath?jdPath:""
+        return jdPath ? jdPath : ""
     },
     selectJdDir: () => {
         return window.utools.showOpenDialog({
@@ -180,14 +181,42 @@ window.ecpack = {
         let pacName = pacPath.substring(index + 1)
         let workPath = path.resolve(pacPath, '..')
         let zipName = pacName + '.zip'
-        let sh = 'zip -q -r ' + zipName + ' ' + pacName
         let exists = fs.existsSync(path.join(workPath, zipName))
         if (exists && workPath.split(path.sep).length > 1 && zipName.endsWith('.zip')) {
             fs.unlinkSync(path.join(workPath, zipName))
         }
-        cmdInPath(sh, workPath).then(() => {
-            window.utools.showNotification('压缩完成，请查看！');
-        })
+
+        const output = fs.createWriteStream(path.join(workPath, zipName));
+        const archive = archiver('zip', {
+            zlib: { level: 9 } // 设置压缩级别
+        });
+
+        output.on('close', function () {
+            window.utools.showNotification(`压缩完成，总共写入了 ${archive.pointer()} 字节，请查看！`);
+        });
+
+        archive.on('error', function (err) {
+            throw err;
+        });
+
+        // 监听所有警告（例如权限错误）
+        archive.on('warning', function (err) {
+            if (err.code === 'EACCES') {
+                console.warn('警告: ' + err);
+            } else {
+                // 抛出错误以停止压缩
+                throw err;
+            }
+        });
+
+        // 管道压缩数据到文件
+        archive.pipe(output);
+
+        // 添加文件夹
+        archive.directory(pacPath, pacName);
+
+        // 完成压缩并关闭流
+        archive.finalize();
     },
     openDir: () => {
         const pacPath = window.ecpack.getPackPath()
