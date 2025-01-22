@@ -1,4 +1,5 @@
 {
+  "type": "commonjs",
   "dependencies": {
     "archiver": "^7.0.1"
   }
