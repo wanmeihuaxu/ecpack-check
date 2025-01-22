@@ -153,7 +153,12 @@ window.ecpack = {
     getPackPath: () => {
         const nativeId = window.utools.getNativeId()
         let pacPath = window.utools.dbStorage.getItem('ecology_path/' + nativeId)
-        return pacPath ? pacPath : ""
+        let exists = fs.existsSync(pacPath)
+        console.log(exists)
+        if(!exists) {
+            window.ecpack.savePackPath('')
+        }
+        return pacPath && exists ? pacPath : ""
     },
     selectDir: () => {
         return window.utools.showOpenDialog({
